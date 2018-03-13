@@ -1,0 +1,10 @@
+{
+  "name": "magic-potato",
+  "version": "0.1.0",
+  "description": "Magical Potato with magic powers.",
+  "main": "bot.js",
+  "author": "Will C",
+  "dependencies": {
+    "discord.io": "github:woor/discord.io#gateway_v6"
+  }
+}
