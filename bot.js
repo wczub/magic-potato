@@ -48,6 +48,20 @@ function love(fname, sname, id){
     });
 };
 
+function gif(phrase, spot){
+    var search = encodeURIComponent(phrase);
+    
+    unirest.get("https://giphy.p.mashape.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&limit=10&q=" + phrase)
+    .header("X-Mashape-Key", "bbf8SOZNlUmsh4OyTDx1u1cKEofXp1C4ESljsnLTTcOTyWkjKE")
+    .header("Accept", "application/json")
+    .end(function (result) {
+        bot.sendMessage({
+            to: spot,
+            message: result.body.data[0].url
+        });
+    });
+}
+
 function squadAdd(channelID, args){
     for (var i = 0; i < args.length; i++){
         console.log(args[i]);
@@ -126,6 +140,12 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         response = "Invalid use. Please enter two names with the command.";
                     }
                     
+                    break;
+                case 'gif':
+                    var phrase = '';
+                    for (var i = 1; i < args.length; i++)
+                        phrase = args[i] + ' ';
+                    gif(phrase, spot);
                     break;
                 default:
                     response = 'Invalid command. Use "!help" to get a list of commands.';
