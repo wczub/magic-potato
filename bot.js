@@ -1,159 +1,163 @@
-var Discord = require('discord.io'),
+var Discord = require('discord.js'),
     auth = require('./auth.json'),
     unirest = require('unirest'),
-    storage = require('node-persist');
+    AsciiTable = require('ascii-table')
+localStorage = require('node-localstorage').LocalStorage;
+const SCORE = 0;
+const TIME = 1;
 
-var bot = new Discord.Client({
-    token: auth.token,
-    autorun: true
-});
+var bot = new Discord.Client();
+bot.login(auth.token);
 
-storage.initSync({
-    continuous: true
-});
+storage = new localStorage('./test');
 
-var commands =  'help: Returns all of the commands possible.\n' +
-                'squad <option>: Use command "!squad help" for a list of options\n' + 
-                'love <name> <name>: Finds out how compatible two people are.\n' +
-                'pubg set <username>: Attaches your PUBG account to your Discord account.\n' +
-                'pubg reset <username>: Removes your PUBG account from your Discord account.',
-    squadCommands = 'list: Displays a list of all squad members.\n' +
-                    'add <usernames>: Adds up to 4 usernames (seperate by spaces). This uses your Discord Username.\n' +
-                    'remove <username>: Removes username from squad. This uses your Discord Username.\n' +
-                    'removeall: Removes everyone from the squad.\n';
-                    
-var squad = [];
-function addUser(id, userName){
-    storage.setItemSync(id, userName);
-    console.log(storage.getItemSync(id));
-    console.log(storage.values());
+var commands = 'help: Returns all of the commands possible.\n' +
+    'shame <name>: Shames a person for gettin zero kills\n';
+
+function addUser(id) {
+    var item = [0, 1000]
+    storage.setItem(id, item);
     return true;
 };
 
-function removeUser(id){
-    storage.removeItemSync(id)
-    return true;
-};
-
-function love(fname, sname, id){
-    unirest.get("https://love-calculator.p.mashape.com/getPercentage?fname=" + fname + "&sname=" + sname)
-    .header("X-Mashape-Key", "bbf8SOZNlUmsh4OyTDx1u1cKEofXp1C4ESljsnLTTcOTyWkjKE")
-    .header("Accept", "application/json")
-    .end(function (result) {
-        var loveResponse = "There is a " + result.body.percentage + " percent chance that " + result.body.fname + " and " + result.body.sname + " are compatible.\n" + result.body.result;
-        bot.sendMessage({
-            to: id,
-            message: loveResponse
-        });
+function score() {
+    response = '```\n';
+    scoreBoard = new Array();
+    storage._keys.forEach(person => {
+        var item = new Object();
+        item.score = getScoreOrTime(storage.getItem(person), SCORE);
+        item.name = person;
+        scoreBoard.push(item);
     });
-};
 
-function gif(phrase, spot){
-    var search = encodeURIComponent(phrase);
-    
-    unirest.get("https://giphy.p.mashape.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&limit=10&q=" + phrase)
-    .header("X-Mashape-Key", "bbf8SOZNlUmsh4OyTDx1u1cKEofXp1C4ESljsnLTTcOTyWkjKE")
-    .header("Accept", "application/json")
-    .end(function (result) {
-        bot.sendMessage({
-            to: spot,
-            message: result.body.data[0].url
-        });
-    });
+    var table = new AsciiTable('The Shame')
+    scoreBoard.sort(compare);
+    scoreBoard.forEach(function (user) {
+        table.addRow(user.name, user.score);
+    })
+    response += table.toString();
+    response += '```';
+
+    return response;
 }
 
-function squadAdd(channelID, args){
-    for (var i = 0; i < args.length; i++){
-        console.log(args[i]);
-    }
+function compare(a, b) {
+    let comparison = 0;
+    if (a.score < b.score)
+        comparison = 1;
+    else if (a.score > b.score)
+        comparison = -1;
+    return comparison;
+}
+
+function getScoreOrTime(str, num) {
+    return Number(str.split(',')[num]);
+}
+
+function addShame(id, newTime) {
+    let shame = getScoreOrTime(storage.getItem(id), SCORE);
+    let oldTime = getScoreOrTime(storage.getItem(id), TIME);
+    if (newTime > oldTime + 120000)
+        storage.setItem(id, [shame + 1, newTime]);
+    else
+        return false;
+    return true;
+}
+
+function removeShame(id, num) {
+    let shame = getScoreOrTime(storage.getItem(id), SCORE);
+    let time = getScoreOrTime(storage.getItem(id), TIME);
+    shame -= num;
+    shame = shame < 0 ? 0 : shame;
+    storage.setItem(id, [shame, time]);
+}
+
+function removeUser(id) {
+    storage.removeItem(id)
+    return true;
 };
 
-bot.on('ready', function() {
-    console.log('Logged in as %s - %s\n', bot.username, bot.id);
-    
+bot.on('ready', function () {
+    console.log('Logged in as %s\n', bot.user);
+
 });
 
-bot.on('message', function (user, userID, channelID, message, evt) {
+bot.on('message', message => {
 
-    console.log(storage.values());
-    console.log(user);
+    if (!message.guild) return;
+    //console.log(message);
+    var emoji;
+    var reacting = false;
+    var messaging = true;
+    var response = '';
 
-    if (message.substring(0, 1) == '!') {
-        var args = message.substring(1).split(' '),
-            cmd = args[0].toLowerCase(),
-            spot = channelID;
-            
-            switch(cmd) {
-                case 'help':
-                    spot = userID;
-                    response = commands;
-                    break;
-                case 'pubg':
-                    var success, mode;
-                    if (args.length == 2 || args.length == 3){
-                        if (args[2] != null && args[1] == "set"){
-                            success = addUser(userID, args[2]);
-                            mode = "set";
-                        } else if (args[1] == "reset") {
-                            success = removeUser(userID);
-                            mode = "reset";
-                        } else {
-                            response = 'Invalid use of command. Use "!help" for a list of commands';
-                            break;
-                        }
-                        if (success)
-                            response = 'Succesfully ' + mode + ' your PUBG account.';
-                        else 
-                            response = 'Failed to ' + mode + ' your PUBG account';
-                    } else {
-                        response = 'Invalid use of command. Use "!help" for a list of commands';
-                    }
-                    break;
-                case 'squad':
-                    var response = '';
-                    if (args.length < 2){
-                        response = 'Invalid use of !squad. Use "!squad options" for a list of options.\n';
-                        break;
-                    }
-                    var opt = args[1];
-                    
-                    if (opt == 'help'){
-                        response = squadCommands;
-                    } else if (opt == 'list') {
-                        response = 'list command'
-                    } else if (opt == 'add'){
-                        response = squadAdd(spot, [args.slice(2)]);
-                    } else if (opt == 'remove'){
-                        response = 'remove command';
-                    } else if (opt == 'removeall'){
-                        response = 'removeAll command';
-                    } else {
-                        response = 'Invalid command. Use "!squad options" for a list of options.\n';
-                    }
-                    
-                    break;
-                case 'love':
-                    
-                    if (args.length >= 3){
-                        love(args[1], args[2], spot);
-                    } else {
-                        response = "Invalid use. Please enter two names with the command.";
-                    }
-                    
-                    break;
-                case 'gif':
-                    var phrase = '';
-                    for (var i = 1; i < args.length; i++)
-                        phrase = args[i] + ' ';
-                    gif(phrase, spot);
-                    break;
-                default:
-                    response = 'Invalid command. Use "!help" to get a list of commands.';
-                    break;
-            }
-            bot.sendMessage({
-                to: spot,
-                message: response
-            });
+    if (message.content.startsWith('!')) {
+        var args = message.content.substring(1).split(' '),
+            cmd = args[0].toLowerCase();
+
+        switch (cmd) {
+            case 'help':
+                response = commands;
+                break;
+
+            case 'setup':
+                if (message.author.username == 'DCSpud') {
+                    if (addUser(args[1]))
+                        emoji = '✅';
+                    else
+                        emoji = '❌';
+                    reacting = true;
+                    messaging = false;
+
+                } else {
+                    response = "You don't have permission to do this."
+                }
+                break;
+            case 'reset':
+                if (message.author.username == 'DCSpud') {
+                    storage._keys.forEach(person => {
+                        addUser(person);
+                    });
+                    response = score();
+                } else {
+                    response = "You don't have permission to do this."
+                }
+                break;
+            case 'shame':
+                if (addShame(args[1], message.createdTimestamp))
+                    emoji = '✅';
+                else
+                    emoji = '❌';
+                reacting = true;
+                messaging = false;
+
+                break;
+
+            case 'unshame':
+                if (message.author.username == 'DCSpud') {
+                    removeShame(args[1], args[2]);
+                    emoji = '✅';
+                    reacting = true;
+                    messaging = false;
+                } else {
+                    response = "You don't have permission to do this."
+                }
+                break;
+
+                break;
+            case 'score':
+                response = score();
+                break;
+            default:
+                response = 'Invalid command. Use "!help" to get a list of commands.';
+                break;
+        }
+        if (reacting) {
+            message.react(emoji);
+        }
+        if (messaging) {
+            message.channel.send(response);
+
+        }
     }
 });
