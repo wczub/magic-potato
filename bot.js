@@ -1,21 +1,22 @@
 var Discord = require('discord.js'),
-    auth = require('./auth.json'),
-    unirest = require('unirest'),
-    log = require('log-to-file');
-AsciiTable = require('ascii-table'),
+    log = require('log-to-file'),
+    AsciiTable = require('ascii-table'),
     localStorage = require('node-localstorage').LocalStorage;
 
 const SCORE = 0;
 const TIME = 1;
 
 var bot = new Discord.Client();
-bot.login(auth.token);
+bot.login(process.env.token);
 
 storage = new localStorage('./shame');
 top = new localStorage('./top');
 
-var commands = 'help: Returns all of the commands possible.\n' +
-    'shame <name>: Shames a person for gettin zero kills\n';
+var commands = '**help**: Returns all of the commands possible.\n' +
+    '**shame** *<name>*: Shames a person for getting zero kills\n' +
+    '**kills** *<name> <number>*: Records a person\'s top kills. Can\'t ne a lower number than already there\n' +
+    '**score**: Shows the Shame score\n' + 
+    '**top**: Show the top kills';
 
 function addUser(id) {
     var item = [0, 1000]

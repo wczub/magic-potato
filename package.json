@@ -4,6 +4,9 @@
   "description": "Magical Potato with magic powers.",
   "main": "bot.js",
   "author": "Will C",
+  "scripts": {
+    "start": "node bot.js"
+  },
   "dependencies": {
     "ascii-table": "0.0.9",
     "discord.js": "^12.2.0",
