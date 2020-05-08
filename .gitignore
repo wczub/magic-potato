@@ -1,6 +1,8 @@
 auth.json
 .node-persist
-test
+shame
+top
 .vscode
 node_modules
 package-lock.json
+default.log
