@@ -49,9 +49,9 @@ function compare(a, b) {
 }
 
 function setKills(id, kills) {
-    var prevKills = top.getItem(id)
+    var prevKills = storage.getItem(id)
     if (kills > prevKills) {
-        top.setItem(id, kills);
+        storage.setItem(id, kills);
         return true;
     }
     return false;
@@ -106,6 +106,7 @@ bot.on('message', message => {
                     }
                     break;
                 case 'kills':
+                    console.log(args.length);
                     if (args.length == 3) {
                         if (setKills(args[1], args[2]))
                             emoji = '✅';
@@ -113,8 +114,14 @@ bot.on('message', message => {
                             emoji = '❌';
                         reacting = true;
                         messaging = false;
+                    } else {
+                        emoji = '❌';
+                        reacting = true;
+                        messaging = false;
                     }
+
                     break;
+                case 'top': 
                 case 'score':
                     response = score();
                     break;
