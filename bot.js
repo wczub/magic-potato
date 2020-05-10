@@ -41,9 +41,11 @@ function score() {
 
 function compare(a, b) {
     let comparison = 0;
-    if (a.score < b.score)
+    var score1 = Number(a.score);
+    var score2 = Number(b.score);
+    if (score1 < score2)
         comparison = 1;
-    else if (a.score > b.score)
+    else if (score1 > score2)
         comparison = -1;
     return comparison;
 }
