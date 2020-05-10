@@ -3,24 +3,17 @@ var Discord = require('discord.js'),
     AsciiTable = require('ascii-table'),
     localStorage = require('node-localstorage').LocalStorage;
 
-const SCORE = 0;
-const TIME = 1;
-
 var bot = new Discord.Client();
 bot.login(process.env.token);
 
-storage = new localStorage('./shame');
-top = new localStorage('./top');
+storage = new localStorage('./top');
 
 var commands = '**help**: Returns all of the commands possible.\n' +
-    '**shame** *<name>*: Shames a person for getting zero kills\n' +
     '**kills** *<name> <number>*: Records a person\'s top kills. Can\'t ne a lower number than already there\n' +
-    '**score**: Shows the Shame score\n' + 
-    '**top**: Show the top kills';
+    '**score**: Shows the top kills\n';
 
 function addUser(id) {
-    var item = [0, 1000]
-    storage.setItem(id, item);
+    storage.setItem(id, 0);
     return true;
 };
 
@@ -29,30 +22,7 @@ function score() {
     scoreBoard = new Array();
     storage._keys.forEach(person => {
         var item = new Object();
-        item.score = getScoreOrTime(storage.getItem(person), SCORE);
-        if (person == "pirate")
-            item.score = item.score / 2;
-        item.name = person;
-        scoreBoard.push(item);
-    });
-
-    var table = new AsciiTable('The Shame')
-    scoreBoard.sort(compare);
-    scoreBoard.forEach(function (user) {
-        table.addRow(user.name, user.score);
-    })
-    response += table.toString();
-    response += '```';
-
-    return response;
-}
-
-function topScore() {
-    response = '```\n';
-    scoreBoard = new Array();
-    top._keys.forEach(person => {
-        var item = new Object();
-        item.score = top.getItem(person);
+        item.score = storage.getItem(person);
         item.name = person;
         if (item.score > 0)
             scoreBoard.push(item);
@@ -78,24 +48,7 @@ function compare(a, b) {
     return comparison;
 }
 
-function getScoreOrTime(str, num) {
-    return Number(str.split(',')[num]);
-}
-
-function addShame(id, newTime) {
-
-    if (storage._keys.indexOf(id) < 0)
-        return false;
-    let shame = getScoreOrTime(storage.getItem(id), SCORE);
-    let oldTime = getScoreOrTime(storage.getItem(id), TIME);
-    if (newTime > oldTime + 120000)
-        storage.setItem(id, [shame + 1, newTime]);
-    else
-        return false;
-    return true;
-}
-
-function topKills(id, kills) {
+function setKills(id, kills) {
     var prevKills = top.getItem(id)
     if (kills > prevKills) {
         top.setItem(id, kills);
@@ -103,19 +56,6 @@ function topKills(id, kills) {
     }
     return false;
 }
-
-function removeShame(id, num) {
-    let shame = getScoreOrTime(storage.getItem(id), SCORE);
-    let time = getScoreOrTime(storage.getItem(id), TIME);
-    shame -= num;
-    shame = shame < 0 ? 0 : shame;
-    storage.setItem(id, [shame, time]);
-}
-
-function removeUser(id) {
-    storage.removeItem(id)
-    return true;
-};
 
 bot.on('ready', function () {
     console.log('Logged in as %s\n', bot.user);
@@ -165,41 +105,18 @@ bot.on('message', message => {
                         response = "You don't have permission to do this."
                     }
                     break;
-                case 'shame':
-                    if (addShame(args[1], message.createdTimestamp))
-                        emoji = '✅';
-                    else
-                        emoji = '❌';
-                    reacting = true;
-                    messaging = false;
-
-                    break;
-
-                case 'unshame':
-                    if (message.author.username == 'DCSpud') {
-                        removeShame(args[1], args[2]);
-                        emoji = '✅';
-                        reacting = true;
-                        messaging = false;
-                    } else {
-                        response = "You don't have permission to do this."
-                    }
-                    break;
                 case 'kills':
                     if (args.length == 3) {
-                        if (topKills(args[1], args[2]))
+                        if (setKills(args[1], args[2]))
                             emoji = '✅';
                         else 
-                        emoji = '❌';
+                            emoji = '❌';
                         reacting = true;
                         messaging = false;
                     }
                     break;
                 case 'score':
                     response = score();
-                    break;
-                case 'top':
-                    response = topScore();
                     break;
                 default:
                     response = 'Invalid command. Use "!help" to get a list of commands.';
