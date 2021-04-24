@@ -34,7 +34,7 @@ bot.on('voiceStateUpdate', async (oldMember, newMember) => {
     let newUserChannel = newMember.channel;
     let oldUserChannel = oldMember.channel;
     if (newMember.member.user.bot) return;
-    if (newMember.guild.id != secrets.test)
+    if (newMember.guild.id != secrets.lowfuel && newMember.guild.id != secrets.test)
         return;
 
     if (oldUserChannel === null && newUserChannel !== null) {
