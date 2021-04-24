@@ -1,5 +1,6 @@
 var secrets = require('./secrets.json'),
     emoji = require('./emojis.json'),
+    log = require('log-to-file'),
     Discord = require('discord.js'),
     AsciiTable = require('ascii-table'),
     localStorage = require('node-localstorage').LocalStorage;
@@ -16,13 +17,39 @@ bot.on('ready', function () {
 
 });
 
-bot.on('message', message => {
+bot.on('message', async message => {
 
+    if (message.author.bot) return;
     if (!message.guild) return;
+    log(message.author.username + ': ' + message.content);
     if (message.guild.id === secrets.test) {
         lowfuel.logic(message);
     }
-    if (message.guild.id == secrets.lowfuel){
+    if (message.guild.id == secrets.lowfuel) {
         lowfuel.logic(message);
-    }  
+    }
 });
+
+bot.on('voiceStateUpdate', async (oldMember, newMember) => {
+    let newUserChannel = newMember.channel;
+    let oldUserChannel = oldMember.channel;
+    if (newMember.member.user.bot) return;
+    if (newMember.guild.id != secrets.test)
+        return;
+
+    if (oldUserChannel === null && newUserChannel !== null) {
+        var user = secrets.sounds.find(x => x.name === newMember.member.user.username)
+        const connection = await newUserChannel.join();
+        const dispatcher = connection.play(user.link, { volume: user.volume });
+
+        dispatcher.on('finish', () => {
+            newUserChannel.leave();
+        });
+        
+        dispatcher.on('error', () => {
+            console.error;
+            newUserChannel.leave();
+        })
+
+    } 
+})
