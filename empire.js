@@ -1,6 +1,7 @@
 var emoji = require("./emojis.json"),
     log = require('log-to-file'),
-    localStorage = require('node-localstorage').LocalStorage;
+    localStorage = require('node-localstorage').LocalStorage,
+    AsciiTable = require('ascii-table');
 const discord = require('discord.js');
 
 storage = new localStorage('./top');
@@ -70,7 +71,7 @@ module.exports = {
                 var args = message.content.substring(1).split(' '),
                     cmd = args[0].toLowerCase();
 
-                switch (cmd) {
+                    switch (cmd) {
                     case 'help':
                         response = commands;
                         break;

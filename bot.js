@@ -2,7 +2,6 @@ var secrets = require('./secrets.json'),
     emoji = require('./emojis.json'),
     log = require('log-to-file'),
     Discord = require('discord.js'),
-    AsciiTable = require('ascii-table'),
     localStorage = require('node-localstorage').LocalStorage;
 
 const lowfuel = require('./lowfuel'),
@@ -21,12 +20,14 @@ bot.on('message', async message => {
 
     if (message.author.bot) return;
     if (!message.guild) return;
-    log(message.author.username + ': ' + message.content);
     if (message.guild.id === secrets.test) {
+        empire.logic(message);
+    }
+    if (message.guild.id === secrets.lowfuel) {
         lowfuel.logic(message);
     }
-    if (message.guild.id == secrets.lowfuel) {
-        lowfuel.logic(message);
+    if (message.guild.id === secrets.empire){
+        empire.logic(message);
     }
 });
 
