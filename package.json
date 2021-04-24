@@ -8,8 +8,10 @@
     "start": "node bot.js"
   },
   "dependencies": {
+    "@discordjs/opus": "^0.5.0",
     "ascii-table": "0.0.9",
     "discord.js": "^12.2.0",
+    "ffmpeg-static": "^4.3.0",
     "log-to-file": "^2.0.2",
     "node-localstorage": "^2.1.6",
     "unirest": "^0.5.1"

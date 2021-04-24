@@ -1,6 +1,6 @@
-auth.json
+secrets.json
 .node-persist
 .vscode
 node_modules
 package-lock.json
-default.log
+*.log
