@@ -50,7 +50,7 @@ function compare(a, b) {
 
 function setKills(id, kills) {
     var prevKills = storage.getItem(id)
-    if (kills > prevKills) {
+    if (Number(kills) > Number(prevKills)) {
         storage.setItem(id, kills);
         return true;
     }
@@ -100,7 +100,6 @@ module.exports = {
                         }
                         break;
                     case 'kills':
-                        console.log(args.length);
                         if (args.length == 3) {
                             if (setKills(args[1], args[2]))
                                 reaction = emoji.success;
