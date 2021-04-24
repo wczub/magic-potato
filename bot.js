@@ -26,7 +26,7 @@ bot.on('message', async message => {
     if (message.guild.id === secrets.lowfuel) {
         lowfuel.logic(message);
     }
-    if (message.guild.id === secrets.empire){
+    if (message.guild.id === secrets.empire) {
         empire.logic(message);
     }
 });
@@ -38,19 +38,24 @@ bot.on('voiceStateUpdate', async (oldMember, newMember) => {
     if (newMember.guild.id != secrets.lowfuel && newMember.guild.id != secrets.test)
         return;
 
-    if (oldUserChannel === null && newUserChannel !== null) {
-        var user = secrets.sounds.find(x => x.name === newMember.member.user.username)
-        const connection = await newUserChannel.join();
-        const dispatcher = connection.play(user.link, { volume: user.volume });
+    try {
 
-        dispatcher.on('finish', () => {
-            newUserChannel.leave();
-        });
-        
-        dispatcher.on('error', () => {
-            console.error;
-            newUserChannel.leave();
-        })
+        if (oldUserChannel === null && newUserChannel !== null) {
+            var user = secrets.sounds.find(x => x.name === newMember.member.user.username)
+            if (user === undefined) return;
+            const connection = await newUserChannel.join();
+            const dispatcher = connection.play(user.link, { volume: user.volume });
 
-    } 
+            dispatcher.on('finish', () => {
+                newUserChannel.leave();
+            });
+
+            dispatcher.on('error', () => {
+                console.error;
+                newUserChannel.leave();
+            })
+        }
+    } catch (error) {
+        log(error, 'errors.log');
+    }
 })
