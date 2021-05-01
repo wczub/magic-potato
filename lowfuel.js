@@ -61,8 +61,8 @@ function poll(message) {
         message.channel.send('Error: Poll size. For help use **!help poll**')
         return;
     }
-    var mentioned = args[0].search(/<@&?\d{18}>/);
-    var question = args[0].replace(/<@&?\d{18}>/, '');
+    var mentioned = args[0].search(/<@&?!?\d{18}>/);
+    var question = args[0].replace(/<@&?!?\d{18}>/, '');
     
     embed = new discord.MessageEmbed();
     embed.setTitle(question);
