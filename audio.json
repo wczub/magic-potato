@@ -1,0 +1,44 @@
+{
+    "sounds": [
+        {
+            "name": "DCSpud",
+            "link": "./sounds/UltraLord.mp3",
+            "volume": 1.2
+        },
+        {
+            "name": "BIG_BARK",
+            "link": "./sounds/topgear.mp3",
+            "volume": 1
+        },
+        {
+            "name": "EricN",
+            "link": "./sounds/helloThere.mp3",
+            "volume": 1
+        },
+        {
+            "name": "c0conut_",
+            "link": "./sounds/weabooo.mp3",
+            "volume": 1
+        },
+        {
+            "name": "MelonPitch",
+            "link": "./sounds/threeway.mp3",
+            "volume": 0.4
+        },
+        {
+            "name": "Nora",
+            "link": "./sounds/stairs.mp3",
+            "volume": 0.6
+        },
+        {
+            "name": "AnthonyGDI",
+            "link": "./sounds/frostedFlakes.mp3",
+            "volume": 0.6
+        },
+        {
+            "name": "Moose",
+            "link": "./sounds/windows.mp3",
+            "volume": 0.5
+        }
+    ]
+}

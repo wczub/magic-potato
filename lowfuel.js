@@ -61,15 +61,16 @@ function poll(message) {
         message.channel.send('Error: Poll size. For help use **!help poll**')
         return;
     }
-    var question = args[0];
-
+    var mentioned = args[0].search(/<@&?\d{18}>/);
+    var question = args[0].replace(/<@&?\d{18}>/, '');
+    
     embed = new discord.MessageEmbed();
     embed.setTitle(question);
     args.splice(0, 1);
     var description = '';
 
     for (let i = 0; i < args.length; i++) {
-        description += emoji.letters[i] + args[i] + '\n';
+        description += emoji.letters[i] + ' ' + args[i] + '\n';
     }
 
     embed.setDescription(description);
@@ -85,8 +86,8 @@ function poll(message) {
             logg('failed poll: ' + message.content);
         });
     
-    message.delete().catch(err => logg('error on delete: ' + err));
-    logg('deleted message');
+    //message.delete().catch(err => logg('error on delete: ' + err));
+    //logg('deleted message');
 }
 
 function logg(msg){
