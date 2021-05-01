@@ -5,7 +5,6 @@ const discord = require('discord.js');
 
 module.exports = {
     logic(message) {
-        //console.log(message);
         var reaction;
         var reacting = false;
         var messaging = true;
@@ -19,15 +18,6 @@ module.exports = {
                     cmd = args[0].toLowerCase();
 
                 switch (cmd) {
-                    case 'test':
-                        reacting = true;
-                        reaction = emoji.A;
-                        break;
-                    case 't':
-                        for (let i = 0; i < 11; i++) {
-                            message.react(emoji.numbers[i]);
-                        }
-                        return;
                     case 'poll':
                         poll.logic(message);
                         break;

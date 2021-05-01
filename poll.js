@@ -16,7 +16,15 @@ module.exports = {
             message.channel.send('Error: Poll size. For help use **!help poll**')
             return;
         }
-        var mentioned = args[0].search(/<@&?!?\d{18}>/);
+        var startMenPos = args[0].search(/<@&?!?\d{18}>/);
+        var endMenPos = args[0].search('>');
+        var mention = '';
+
+        var menOutput = endMenPos - startMenPos;
+        if (menOutput >= 20 && menOutput <= 21){
+            mention = args[0].substring(startMenPos, endMenPos + 1);
+        }
+
         var question = args[0].replace(/<@&?!?\d{18}>/, '');
 
         embed = new discord.MessageEmbed();
@@ -30,6 +38,10 @@ module.exports = {
 
         embed.setDescription(description);
         logg('sent embeded message');
+        if (mention != '') {
+            message.channel.send(mention).catch(err => logg('error on mention send: ' + err));
+        }
+        
         message.channel.send(embed)
             .then(newMessage => {
                 for (let i = 0; i < args.length; i++) {
@@ -41,8 +53,8 @@ module.exports = {
                 logg('failed poll: ' + message.content);
             });
 
-        //message.delete().catch(err => logg('error on delete: ' + err));
-        //logg('deleted message');
+        message.delete().catch(err => logg('error on delete: ' + err));
+        logg('deleted message');
     }
 }
 
