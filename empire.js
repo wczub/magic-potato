@@ -1,8 +1,8 @@
 var emoji = require("./emojis.json"),
+    poll = require('./poll'),
     log = require('log-to-file'),
     localStorage = require('node-localstorage').LocalStorage,
     AsciiTable = require('ascii-table');
-const discord = require('discord.js');
 
 storage = new localStorage('./top');
 
@@ -117,6 +117,10 @@ module.exports = {
                     case 'top':
                     case 'score':
                         response = score();
+                        break;
+                    case 'poll':
+                        poll.logic(message);
+                        message = false;
                         break;
                     default:
                         response = 'Invalid command. Use "!help" to get a list of commands.';
