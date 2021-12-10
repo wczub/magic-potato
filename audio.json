@@ -27,7 +27,7 @@
         },
         {
             "name": "Nora",
-            "link": "./sounds/stairs.mp3",
+            "link": "./sounds/mariokartwii.mp3",
             "volume": 0.6
         },
         {
@@ -38,6 +38,11 @@
         {
             "name": "Moose",
             "link": "./sounds/windows.mp3",
+            "volume": 0.5
+        },
+        {
+            "name": "Kourtle",
+            "link": "./sounds/who_can_get_loose.mp3",
             "volume": 0.5
         }
     ]

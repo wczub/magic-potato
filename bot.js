@@ -1,5 +1,5 @@
 var secrets = require('./secrets.json'),
-    audio = require('./audio.json'),
+    audios = require('./audio.json'),
     log = require('log-to-file'),
     Discord = require('discord.js'),
     localStorage = require('node-localstorage').LocalStorage;
@@ -37,13 +37,13 @@ bot.on('voiceStateUpdate', async (oldMember, newMember) => {
     if (newMember.member.user.bot) return;
     if (newMember.guild.id != secrets.lowfuel && newMember.guild.id != secrets.test)
         return;
-
     try {
-
         if (oldUserChannel === null && newUserChannel !== null) {
-            var user = audio.sounds.find(x => x.name === newMember.member.user.username)
+            var user = audios.sounds.find(x => x.name === newMember.member.user.username);
+            
             if (user === undefined) return;
             const connection = await newUserChannel.join();
+           
             const dispatcher = connection.play(user.link, { volume: user.volume });
 
             dispatcher.on('finish', () => {

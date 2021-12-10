@@ -5,7 +5,7 @@ const discord = require('discord.js');
 module.exports = {
     logic(message) {
         logg('poll: ' + message.content);
-        if (message.content.toLowerCase() === '!poll help') {
+        if (message.content.toLowerCase() === '!poll help' || message.content.toLowerCase() === '!help poll') {
             message.channel.send('Poll sizes should be between 2 and 20.\n' +
                 'Format: !poll *The thing being polled* | *option 1*' +
                 ' | *option 2* | *option 3* etc...');

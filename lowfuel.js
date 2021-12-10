@@ -11,7 +11,7 @@ module.exports = {
         var response = '';
 
         try {
-            if (message.content.startsWith('!')) {
+            if (message.content.startsWith('!') || message.content.startsWith('/')) {
                 log(message.author.username + ' ' + message.content + ' ');
 
                 var args = message.content.substring(1).split(' '),
